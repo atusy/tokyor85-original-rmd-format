@@ -1,0 +1,173 @@
+---
+title: |
+  R Markdownの \
+  オリジナルフォーマットを \
+  作ろう
+subtitle: "Tokyo.R 85"
+date: 2020-5-23
+author: Atusy
+output:
+  revealjs::revealjs_presentation:
+    keep_md: true
+    self_contained: false
+    center: true
+    css: revealjs.css
+    math: null
+---
+
+```{r setup, include=FALSE}
+`%>%` <- magrittr::`%>%`
+```
+
+
+```{r knitr, include=FALSE}
+library(knitr)
+library(flextable)
+opts_chunk$set(cache = TRUE, collapse = TRUE, comment = "#>")
+```
+# {#self-intro}
+
+
+::: {.col style='width:300px'}
+
+### ***Atusy***
+
+![](https://github.com/atusy/presentation/blob/master/headphone.jpg?raw=true){width=300px}
+
+:::
+
+::: {.col style='width:600px'}
+
+* R Markdown関係のコミッタ
+* felp、ftExtra、minidownなどパッケージを作ってはTokyoRで紹介している
+* Pythonでデータ分析してる \
+  \@ HACARUS Inc.
+* ![](https://icongr.am/feather/home.svg)
+  [blog.atusy.net](https://blog.atusy.net)
+* ![](https://icongr.am/feather/twitter.svg)
+  [\@Atsushi776](https://twitter.com/Atsushi776)
+
+:::
+
+# ![](osakar_600_600.png){height=400px}
+
+* Skype朝もく (毎平日7:30--10:00)
+    * 途中参加・途中離脱OK
+* 勉強会 (初回6/6)
+* <https://osaka-r.connpass.com/>
+
+# minidown on CRAN
+
+`mini_document`
+
+* 軽量CSSフレームワーク採用
+* JavaScriptを最小限にしつつも高機能
+    * `floating_toc`
+    * `code_folding`
+    * `code_download` (開発版)
+    * など
+
+<https://minidown.atusy.net>
+
+# 今日のお題
+
+YAMLフロントマターに書くアレの
+
+オリジナル版を作れるようになろう
+
+```yaml
+output: html_document # アレ
+```
+
+## アレ is 関数
+
+
+```{=html}
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr"><a href="https://twitter.com/hashtag/TokyoR?src=hash&amp;ref_src=twsrc%5Etfw">#TokyoR</a> のスライド作るにあたってR Markdownユーザーに聞きたい。YAMLフロントマターの<br>output: html_document<br>のhtml_documentは関数だと</p>&mdash; atusy (@Atsushi776) <a href="https://twitter.com/Atsushi776/status/1261074199780548610?ref_src=twsrc%5Etfw">May 14, 2020</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
+```
+
+
+# フォーマット作ろうよ
+
+YAMLシンプルにしたいやん?
+
+```yaml
+output: mydown::my_document
+```
+
+## 必要ある?
+
+[R Markdownの内部とテンプレート開発 by kazutan氏](https://kazutan.github.io/HijiyamaR6/intoTheRmarkdown.html#/)
+
+によると
+
+> だいたいYAMLフロントマター指定すれば済むからフォーマット作らなくていいよ（意訳）
+
+らしいが……
+
+## え、これコピペするの？
+
+by コピペ撲滅委員会
+
+```yaml
+output:
+  html_document:
+    highlight: tango
+    theme: yeti
+    mathjax: null
+    md_extensions: +east_asian_line_breaks
+```
+
+## YAMLで済む範囲も<br/>フォーマット化する価値あり
+
+# Lv. 1: ラッパー定義 {#level-1}
+
+`output`の
+
+`html_document`とか`word_document`は関数だから、
+
+ラッパー書くと`output`に指定できるんだよ！
+
+## `html_document`は関数だよ
+
+YAML使わないなら↓な感じ。
+
+```{r, eval=FALSE}
+library(rmarkdown)
+fmt <- html_document(
+  highlight = "tango",
+  theme = "yeti",
+  mathjax = NULL,
+  md_extensions = "+east_asian_line_breaks"
+)
+render("index.Rmd", output_format = fmt)
+```
+
+## 使い回す操作はパッケージ化しよう {#define-functions}
+
+`output: mydown::my_document`
+
+で済むようになるぞ！！
+
+```{r}
+my_document <-function(
+  highlight = "tango", theme = "yeti", 
+  md_extensions = "+east_asian_line_breaks",
+  mathjax = NULL, ...
+) {
+  html_document(
+    highlight = highlight, theme = them, mathjax = mathjax, md_extensions = md_extensions, ...
+  )
+}
+```
+
+# Lv. 2: 依存ファイル追加 {#level-2}
+
+# Lv. 3: output_fromat関数事始 {#level-3}
+
+# Enjoy & Help Me!
+
+- Stars
+- Issues
+- PRs
+- Sponsors
