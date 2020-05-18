@@ -23,7 +23,7 @@ output:
 ```{r knitr, include=FALSE}
 library(knitr)
 library(flextable)
-opts_chunk$set(cache = TRUE, collapse = TRUE, comment = "#>")
+opts_chunk$set(eval = FALSE, collapse = TRUE, comment = "#>")
 ```
 # {#self-intro}
 
@@ -92,7 +92,7 @@ output: html_document # アレ
 YAMLシンプルにしたいやん?
 
 ```yaml
-output: mydown::my_document
+output: tokyor85down::simple_document
 ```
 
 ## 必要ある?
@@ -105,28 +105,31 @@ output: mydown::my_document
 
 らしいが……
 
-## え、これコピペするの？
-
-by コピペ撲滅委員会
+## コピペ撲滅委員会「あるよ！」
 
 ```yaml
 output:
-  html_document:
-    highlight: tango
-    theme: yeti
-    mathjax: null
+  word_document:
+    toc: TRUE
+    toc_depth: 2
+    df_print: kable
     md_extensions: +east_asian_line_breaks
 ```
+
+* コピペしたい?
+* どこ変更したっけ?
 
 ## YAMLで済む範囲も<br/>フォーマット化する価値あり
 
 # Lv. 1: ラッパー定義 {#level-1}
 
-`output`の
+`output`に指定する
 
-`html_document`とか`word_document`は関数だから、
+`word_document`とかは
 
-ラッパー書くと`output`に指定できるんだよ！
+**関数**だから、
+
+ラッパー書けば`output`に指定できる！
 
 ## `html_document`は関数だよ
 
@@ -134,10 +137,10 @@ YAML使わないなら↓な感じ。
 
 ```{r, eval=FALSE}
 library(rmarkdown)
-fmt <- html_document(
-  highlight = "tango",
-  theme = "yeti",
-  mathjax = NULL,
+fmt <- word_document(
+  toc = TRUE,
+  toc_depth = 2,
+  df_print = "kable",
   md_extensions = "+east_asian_line_breaks"
 )
 render("index.Rmd", output_format = fmt)
@@ -145,23 +148,144 @@ render("index.Rmd", output_format = fmt)
 
 ## 使い回す操作はパッケージ化しよう {#define-functions}
 
-`output: mydown::my_document`
+`output: tokyor85down::custom_word_document`
 
 で済むようになるぞ！！
 
-```{r}
-my_document <-function(
-  highlight = "tango", theme = "yeti", 
-  md_extensions = "+east_asian_line_breaks",
-  mathjax = NULL, ...
+```{r, eval=FALSE}
+custom_word_document <-function(
+  toc = TRUE, toc_depth = 2, df_print = "kable",
+  md_extensions = "+east_asian_line_breaks"
 ) {
-  html_document(
-    highlight = highlight, theme = them, mathjax = mathjax, md_extensions = md_extensions, ...
+  word_document(
+    toc = toc, toc_depth, df_print = df_print,
+    md_extensions = md_extensions, ...
   )
 }
 ```
 
-# Lv. 2: 依存ファイル追加 {#level-2}
+# Lv. 2: 依存ファイル追加 {#level-2-word}
+
+**基本編（絶対パスOK）**
+
+例えば \
+`word_document`関数にオリジナルの \
+`reference_docx`を指定したい
+
+`<small>`{=html}
+HTMLで`self_contained=FALSE`を使わない限りは、基本編で十分なはず。
+`</small>`{=html}
+
+## 依存ファイルをパッケージに追加
+
+必要なファイルを \
+パッケージの`inst`ディレクトリ以下の \
+好きなところに保存しておく
+
+* `inst`
+    * `resources`
+        * `style.css`
+        * `style.docx`
+
+
+## Wordのテンプレを差し替え
+
+```{r, eval=FALSE}
+# パッケージからテンプレを探す関数
+find_docx <- function () {
+  system.file(
+    "inst", "resources", "style.docx",
+    package = "tokyor85down")
+}
+```
+
+
+```{r, eval=FALSE}
+# docx()をreference_docxの既定値に変更
+styled_word_document <- 
+  function(reference_docx = find_docx(), ...) {
+  word_document(
+    reference_docx = reference_docx, ...)
+}
+```
+
+
+# Lv. 3: 依存ファイル追加 {#level-2-html}
+
+**応用編（絶対パスNG）**
+
+たとえば
+
+`html_document`関数にオリジナルの \
+`css`を指定したい
+
+## HTMLのCSS差し替え (BAD)
+
+```{r, eval=FALSE}
+find_css <- function () {
+  system.file(
+    "inst", "resources", "style.css",
+    package = "tokyor85down")
+}
+styled_html_document <- 
+  function(css = find_css(), ...) {
+  html_document(css = css, ...)
+}
+```
+
+## CSS追加との相性が悪い
+
+```{r, eval=FALSE}
+styled_html_document(css = "new.css")
+```
+
+は必要なCSSを無視してしまうので
+
+```{r, eval=FALSE}
+styled_html_document(
+  css = c(find_css(), "new.css")
+)
+```
+
+する必要がある。めんどい。
+
+## 携帯性の悪いHTMLができる
+
+```{r, eval=FALSE}
+styled_html_document(
+  self_contained = FALSE
+)
+```
+
+↓
+
+パッケージディレクトリ下にある \
+CSSを絶対パスで参照
+
+## extra_dependencies引数を使おう
+
+CSSとかJavaScriptを指定しておくと、
+
+* `self_contained = TRUE`なら依存ファイルを
+    * HTMLファイルに丸ごと取り込む
+* `self_contained= FALSE`なら依存ファイルを
+    * `lib_dir`引数で指定した場所にコピーし
+    * HTMLファイルから相対パスで参照する
+
+## extra_dependencies引数の使い方
+
+```{r, eval=FALSE}
+extra_dependencies <- list(htmltools::htmlDependency(
+    name = "tokyor85down",
+    version = "0.0.1",
+    stylesheet = "style.css",
+    src = "./inst/resources",
+    package = "tokyor85down",
+    all_files = FALSE
+))
+
+html_document(extra_dependencies = extra_dependencies)
+```
 
 # Lv. 3: output_fromat関数事始 {#level-3}
 
