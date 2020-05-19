@@ -118,6 +118,7 @@ output:
 
 * コピペしたい?
 * どこ変更したっけ?
+* 勝手に弄られないと信じられる?
 
 ## YAMLで済む範囲も<br/>フォーマット化する価値あり
 
@@ -173,7 +174,7 @@ custom_word_document <-function(
 `reference_docx`を指定したい
 
 `<small>`{=html}
-HTMLで`self_contained=FALSE`を使わない限りは、基本編で十分なはず。
+HTMLで`self_contained = FALSE`を使わない限りは、基本編で十分なはず。
 `</small>`{=html}
 
 ## 依存ファイルをパッケージに追加
@@ -209,6 +210,20 @@ styled_word_document <-
 }
 ```
 
+## 注: system.fileは関数内で使おう {#use-system-file-in-function}
+
+`system.file`を直接実行すると \
+パッケージをバイナリ化した場合に \
+バイナリ化したシステムのパスに \
+固定されてしまう
+
+
+```{r}
+# NG
+docx <- system.file(
+  "inst", "resources", "style.docx",
+  package = "tokyor85down")
+```
 
 # Lv. 3: 依存ファイル追加 {#level-2-html}
 
@@ -268,26 +283,68 @@ CSSとかJavaScriptを指定しておくと、
 
 * `self_contained = TRUE`なら依存ファイルを
     * HTMLファイルに丸ごと取り込む
-* `self_contained= FALSE`なら依存ファイルを
+* `self_contained = FALSE`なら依存ファイルを
     * `lib_dir`引数で指定した場所にコピーし
     * HTMLファイルから相対パスで参照する
 
-## extra_dependencies引数の使い方
+## 依存ファイルリストを作る
+
+ための**関数**を作る
 
 ```{r, eval=FALSE}
-extra_dependencies <- list(htmltools::htmlDependency(
+dep <- function() {
+  list(htmltools::htmlDependency(
     name = "tokyor85down",
     version = "0.0.1",
+    src = "./inst/resources/css",
     stylesheet = "style.css",
-    src = "./inst/resources",
     package = "tokyor85down",
-    all_files = FALSE
-))
-
-html_document(extra_dependencies = extra_dependencies)
+  ))
+}
 ```
 
-# Lv. 3: output_fromat関数事始 {#level-3}
+## ラッパー関数を書く
+
+ことで依存ファイルリストを利用する
+
+```{r}
+styled_html_document <- function(
+  extra_dependencies = NULL, ...
+) {
+  html_document(
+    extra_dependencies = 
+      append(dep(), extra_dependencies),
+    ...
+  )
+}
+```
+
+## 注: htmlDependencyは関数内で使おう {#use-html-dependency-in-function}
+
+参考: [`system.file`は関数内で使おう](#use-system-file-in-function)
+
+```{r}
+# NG
+dep <- htmltools::htmlDependency(
+  name = "tokyor85down",
+  version = "0.0.1",
+  src = "./inst/resources/css",
+  stylesheet = "style.css",
+  package = "tokyor85down",
+)
+```
+
+
+# Lv. 3: output_format関数へ {#level-3}
+
+もっと自在に前処理とか後処理したくなったら
+
+`rmarkdown::output_format`関数を使おう
+
+詳しくは↓
+
+[R Markdownの内部とテンプレート開発 by kazutan氏](https://kazutan.github.io/HijiyamaR6/intoTheRmarkdown.html#/)
+
 
 # Enjoy & Help Me!
 
