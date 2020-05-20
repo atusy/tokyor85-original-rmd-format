@@ -40,8 +40,7 @@ opts_chunk$set(eval = FALSE, collapse = TRUE, comment = "#>")
 
 * R Markdown関係のコミッタ
 * felp、ftExtra、minidownなどパッケージを作ってはTokyoRで紹介している
-* Pythonでデータ分析してる \
-  \@ HACARUS Inc.
+* Pythonでデータ分析してる
 * ![](https://icongr.am/feather/home.svg)
   [blog.atusy.net](https://blog.atusy.net)
 * ![](https://icongr.am/feather/twitter.svg)
