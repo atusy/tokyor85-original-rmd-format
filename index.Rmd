@@ -403,13 +403,22 @@ on_exit | 関数 |
 base_format | リスト |
 -->
 
+# Lv.5 テンプレ.Rmd作り
+
+`File` -> `New File` -> `R Markdown...` \
+からテンプレを選べるようにするには
+
+`GOTO`
+
+[R Markdownの内部とテンプレート開発 by kazutan氏](https://kazutan.github.io/HijiyamaR6/intoTheRmarkdown.html#/)
+
 # Lv.0 self_contained例外処理
 
 参考
 
 * [Pandocにself containedさせたくないデータにはdata-external="1"を属性付与しよう](https://blog.atusy.net/2020/04/27/pandoc-data-external/)
 
-# Lv.5 Lua Filter
+# Lv.? Lua Filter
 
 * 出力をRで弄ると正規表現沼に陥る。
     * コードブロックを弄るために```` ``` ````を探すとか。
