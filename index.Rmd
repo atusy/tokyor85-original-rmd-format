@@ -139,6 +139,13 @@ output:
 
 書けるようになろう☆
 
+フルスクラッチが怖いなら \
+[atusy/tokyor85down](https://github.com/atusy/tokyor85down) \
+を弄るところから始めよう
+
+インストールするには \
+`remotes::install_github("atusy/tokyor85down)`{.r}
+
 # Lv.1 ラッパー定義 {#level-1}
 
 `output`に指定する
