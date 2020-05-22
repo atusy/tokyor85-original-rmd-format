@@ -16,14 +16,27 @@ output:
 ---
 
 ```{r setup, include=FALSE}
+library(rmarkdown)
 `%>%` <- magrittr::`%>%`
 ```
 
 
 ```{r knitr, include=FALSE}
 library(knitr)
-library(flextable)
 opts_chunk$set(eval = FALSE, collapse = TRUE, comment = "#>")
+tokyor85down <- "tokyor85down" %in% rownames(installed.packages())
+gh <- function(filename, txt = "実装はGitHubで", dir = "R") {
+  sprintf(
+    "[%s](%s){%s}",
+    txt,
+    file.path(
+      "https://github.com/atusy/tokyor85down/blob/master",
+      dir,
+      filename
+    ),
+    "target='_blank'"
+  )
+}
 ```
 # {#self-intro}
 
@@ -91,7 +104,7 @@ output: html_document # アレ
 YAMLシンプルにしたいやん?
 
 ```yaml
-output: tokyor85down::simple_document
+output: tokyor85down::rich_html_document
 ```
 
 ## 必要ある?
@@ -108,24 +121,29 @@ output: tokyor85down::simple_document
 
 ```yaml
 output:
-  word_document:
+  html_document:
     toc: TRUE
-    toc_depth: 2
-    df_print: kable
-    md_extensions: +east_asian_line_breaks
+    toc_float: TRUE,
+    number_sections: TRUE,
+    code_folding: show
+    code_download: TRUE
 ```
 
 * コピペしたい?
 * どこ変更したっけ?
 * 勝手に弄られないと信じられる?
 
-## YAMLで済む範囲も<br/>フォーマット化する価値あり
+## YAMLで済む範囲も`<br/>`{=html}フォーマット化する価値あり
 
-# Lv. 1: ラッパー定義 {#level-1}
+## 要件: パッケージを書ける
+
+書けるようになろう☆
+
+# Lv.1 ラッパー定義 {#level-1}
 
 `output`に指定する
 
-`word_document`とかは
+`html_document`とかは
 
 **関数**だから、
 
@@ -137,34 +155,28 @@ YAML使わないなら↓な感じ。
 
 ```{r, eval=FALSE}
 library(rmarkdown)
-fmt <- word_document(
+fmt <- html_document(
   toc = TRUE,
-  toc_depth = 2,
-  df_print = "kable",
-  md_extensions = "+east_asian_line_breaks"
+  toc_float = TRUE,
+  number_sections = TRUE,
+  code_folding = "show",
+  code_download = TRUE,
 )
 render("index.Rmd", output_format = fmt)
 ```
 
 ## 使い回す操作はパッケージ化しよう {#define-functions}
 
-`output: tokyor85down::custom_word_document`
-
+`output: tokyor85down::rich_html_document` \
 で済むようになるぞ！！
 
-```{r, eval=FALSE}
-custom_word_document <-function(
-  toc = TRUE, toc_depth = 2, df_print = "kable",
-  md_extensions = "+east_asian_line_breaks"
-) {
-  word_document(
-    toc = toc, toc_depth, df_print = df_print,
-    md_extensions = md_extensions, ...
-  )
-}
+`r gh("rich-html-document.R")`
+
+```{r, eval=tokyor85down}
+tokyor85down::rich_html_document
 ```
 
-# Lv. 2: 依存ファイル追加 {#level-2-word}
+# Lv.2 依存ファイル追加 {#level-2-word}
 
 **基本編（絶対パスOK）**
 
@@ -176,78 +188,76 @@ custom_word_document <-function(
 HTMLで`self_contained = FALSE`を使わない限りは、基本編で十分なはず。
 `</small>`{=html}
 
+## Wordの見出しに番号が欲しい！
+
+ではYAMLで`reference_docx`を指定しましょう。
+
+```yaml
+output:
+  word_document:
+    reference_docx: reference.docx
+```
+
+コピペ撲滅委員会 \
+「プロジェクトごとにファイルコピペとか許せん」
+
 ## 依存ファイルをパッケージに追加
 
 必要なファイルを \
 パッケージの`inst`ディレクトリ以下の \
 好きなところに保存しておく
 
-* `inst`
-    * `resources`
-        * `style.css`
-        * `style.docx`
+```{r, eval=TRUE, include=FALSE}
+docx <- "`inst/docx/reference.docx`"
+```
+
+例えば`r gh(txt = docx, dir = "", filename = docx)`
 
 
 ## Wordのテンプレを差し替え
 
-```{r, eval=FALSE}
+`r gh("styled-word-document.R")`
+
+```{r}
 # パッケージからテンプレを探す関数
-find_docx <- function () {
-  system.file(
-    "inst", "resources", "style.docx",
-    package = "tokyor85down")
-}
+tokyor85down::spec_reference_docx
 ```
-
-
-```{r, eval=FALSE}
-# docx()をreference_docxの既定値に変更
-styled_word_document <- 
-  function(reference_docx = find_docx(), ...) {
-  word_document(
-    reference_docx = reference_docx, ...)
-}
-```
-
-## 注: system.fileは関数内で使おう {#use-system-file-in-function}
-
-`system.file`を直接実行すると \
-パッケージをバイナリ化した場合に \
-バイナリ化したシステムのパスに \
-固定されてしまう
 
 
 ```{r}
-# NG
-docx <- system.file(
-  "inst", "resources", "style.docx",
-  package = "tokyor85down")
+# reference_docx引数の既定値を
+# spec_reference_docx()
+# に変更したword_document
+tokyor85down::styled_word_document
 ```
 
-# Lv. 3: 依存ファイル追加 {#level-2-html}
+# Lv.3 依存ファイル追加 {#level-2-html}
 
 **応用編（絶対パスNG）**
 
-たとえば
-
+たとえば \
 `html_document`関数にオリジナルの \
 `css`を指定したい
 
-## HTMLのCSS差し替え (BAD)
+`self_contained: FALSE`な時は \
+プロジェクトディレクトリにCSSを \
+自動でコピーして欲しい
+
+## CSS引数を弄るとBAD
 
 ```{r, eval=FALSE}
-find_css <- function () {
+spec_css <- function () {
   system.file(
     "inst", "resources", "style.css",
     package = "tokyor85down")
 }
 styled_html_document <- 
-  function(css = find_css(), ...) {
+  function(css = spec_css(), ...) {
   html_document(css = css, ...)
 }
 ```
 
-## CSS追加との相性が悪い
+## CSS追加との相性がBAD
 
 ```{r, eval=FALSE}
 styled_html_document(css = "new.css")
@@ -257,13 +267,13 @@ styled_html_document(css = "new.css")
 
 ```{r, eval=FALSE}
 styled_html_document(
-  css = c(find_css(), "new.css")
+  css = c(spec_css(), "new.css")
 )
 ```
 
 する必要がある。めんどい。
 
-## 携帯性の悪いHTMLができる
+## HTMLの携帯性もBAD
 
 ```{r, eval=FALSE}
 styled_html_document(
@@ -278,7 +288,8 @@ CSSを絶対パスで参照
 
 ## extra_dependencies引数を使おう
 
-CSSとかJavaScriptを指定しておくと、
+この引数で依存したい \
+CSSとかJavaScriptを定義しておくと、
 
 * `self_contained = TRUE`なら依存ファイルを
     * HTMLファイルに丸ごと取り込む
@@ -286,55 +297,9 @@ CSSとかJavaScriptを指定しておくと、
     * `lib_dir`引数で指定した場所にコピーし
     * HTMLファイルから相対パスで参照する
 
-## 依存ファイルリストを作る
+`r gh("styled-html-document.R")`
 
-ための**関数**を作る
-
-```{r, eval=FALSE}
-dep <- function() {
-  list(htmltools::htmlDependency(
-    name = "tokyor85down",
-    version = "0.0.1",
-    src = "./inst/resources/css",
-    stylesheet = "style.css",
-    package = "tokyor85down",
-  ))
-}
-```
-
-## ラッパー関数を書く
-
-ことで依存ファイルリストを利用する
-
-```{r}
-styled_html_document <- function(
-  extra_dependencies = NULL, ...
-) {
-  html_document(
-    extra_dependencies = 
-      append(dep(), extra_dependencies),
-    ...
-  )
-}
-```
-
-## 注: htmlDependencyは関数内で使おう {#use-html-dependency-in-function}
-
-参考: [`system.file`は関数内で使おう](#use-system-file-in-function)
-
-```{r}
-# NG
-dep <- htmltools::htmlDependency(
-  name = "tokyor85down",
-  version = "0.0.1",
-  src = "./inst/resources/css",
-  stylesheet = "style.css",
-  package = "tokyor85down",
-)
-```
-
-
-# Lv. 3: output_format関数へ {#level-3}
+# Lv.4 output_format関数へ {#level-3}
 
 もっと自在に前処理とか後処理したくなったら
 
@@ -344,10 +309,125 @@ dep <- htmltools::htmlDependency(
 
 [R Markdownの内部とテンプレート開発 by kazutan氏](https://kazutan.github.io/HijiyamaR6/intoTheRmarkdown.html#/)
 
+## base_formatを改造できる
 
-# Enjoy & Help Me!
+チャンクを実行しても一切出力に反映しない \
+ジョークフォーマットに魔改造できる
 
-- Stars
-- Issues
-- PRs
-- Sponsors
+```{r}
+output_format(
+  knitr = rmarkdown::knitr_options(
+    opts_chunk = list(include = FALSE)
+  ),
+  base_format = html_document()
+)
+```
+
+## 返り値はリスト
+
+```{r, eval=TRUE}
+fmt <- rmarkdown::output_format(NULL, NULL)
+str(fmt)
+```
+
+## 要素の名前は引数由来
+
+ただし`base_format`を除く
+
+```{r, eval=TRUE}
+nm_arg <- names(formals(output_format))
+nm_fmt <- names(fmt)
+
+setdiff(nm_arg, nm_fmt)
+setdiff(nm_fmt, nm_arg)
+```
+
+## html_documentとの比較
+
+```{r, eval=TRUE}
+html_fmt <- html_document()
+
+identical(nm_fmt, names(html_fmt))
+
+str(html_fmt)
+```
+
+## なぜ`output_format`で改造するのか?
+
+* `html_document()`がリストなら直接改造もできる
+
+* しかし`output_format`は、改造した部分を良い感じに `base_format`と結合してくれる
+
+* **ただし、`keep_md`と`clean_supported`（`self_contained`相当）を除く**
+
+    * 新しいフォーマットの`keep_md`引数と`self_contained`引数は、
+      `base_format`ではなく、`output_format`に食わせること。
+
+## on_exit処理の結合例
+
+```{r}
+# on_exitには最終処理を記述すると
+output_format(
+  on_exit = function(...) message("Almost done"),
+  base_format = html_document()
+)
+```
+
+```{r}
+# 2つのon_exitを結合してくれる
+function(...) c(
+    html_document()$on_exit(...),
+    function(...) message("Almost done")
+  )
+```
+
+## 結合方法の詳細は
+
+`rmarkdown:::merge_output_formats`の実装を見てネ。
+
+
+<!--
+引数|型|概要
+--|--
+knitr | リスト | `knitr::knit`のオプションやフック
+pandoc | リスト | Pandocのオプション
+keep_md | 論理 | mdファイルを残すか
+clean_supporting | 論理 | 中間ファイルを消すか
+df_print | 文字列または関数 | データフレームの出力形式
+pre_knit | 関数 | knit前に実行しておく関数
+post_knit | 関数 | knit後
+pre_processor | 関数 |
+intermediates_generator | 関数 |
+post_processor | 関数 |
+on_exit | 関数 |
+base_format | リスト |
+-->
+
+# Lv.0 self_contained例外処理
+
+参考
+
+* [Pandocにself containedさせたくないデータにはdata-external="1"を属性付与しよう](https://blog.atusy.net/2020/04/27/pandoc-data-external/)
+
+# Lv.5 Lua Filter
+
+* 出力をRで弄ると正規表現沼に陥る。
+    * コードブロックを弄るために```` ``` ````を探すとか。
+* Lua Filterを使うと関数名を変えるだけで、特定の要素を弄れる
+    * 段落なら`Para`関数
+    * コードブロックなら`CodeBlock`関数など
+* 参考
+    * [Pandoc lua filter手習い: detailクラス付きのコードブロックを折り畳む](https://blog.atusy.net/2020/03/07/pandoc-lua-detailed-codeblock/)
+
+
+# Enjoy & Sponsor Me!
+
+* Rにこれからもどんどん貢献したい
+    * プロジェクトにもコミュニティにも
+    * ただし趣味として
+* TwitterとかGitHubで褒めてください
+* スポンサーもして頂けると非常にありがたいです
+    * モチベーション維持
+    * 開発環境や移動のための予算確保
+
+<https://github.com/sponsor/atusy>
