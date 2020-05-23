@@ -153,13 +153,9 @@ output:
 
 # Lv.1 ラッパー定義 {#level-1}
 
-`output`に指定する
+`html_document`とかは**関数**！
 
-`html_document`とかは
-
-**関数**だから、
-
-ラッパー書けば`output`に指定できる！
+ラッパー関数も`output`に指定可！
 
 ## `html_document`は関数だよ
 
@@ -191,10 +187,6 @@ tokyor85down::rich_html_document
 # Lv.2 依存ファイル追加 {#level-2-word}
 
 **基本編（絶対パスOK）**
-
-例えば \
-`word_document`関数にオリジナルの \
-`reference_docx`を指定したい
 
 `<small>`{=html}
 HTMLで`self_contained = FALSE`を使わない限りは、基本編で十分なはず。
@@ -275,15 +267,7 @@ styled_html_document <-
 styled_html_document(css = "new.css")
 ```
 
-は必要なCSSを無視してしまうので
-
-```{r, eval=FALSE}
-styled_html_document(
-  css = c(spec_css(), "new.css")
-)
-```
-
-する必要がある。めんどい。
+パッケージ提供のCSSを無視してしまう
 
 ## HTMLの携帯性もBAD
 
@@ -293,19 +277,17 @@ styled_html_document(
 )
 ```
 
-↓
-
 パッケージディレクトリ下にある \
 CSSを絶対パスで参照
 
 ## extra_dependencies引数を使おう
 
-この引数で依存したい \
-CSSとかJavaScriptを定義しておくと、
+依存したいCSSとかJavaScriptを \
+`self_contained`が
 
-* `self_contained = TRUE`なら依存ファイルを
+* `TRUE`なら
     * HTMLファイルに丸ごと取り込む
-* `self_contained = FALSE`なら依存ファイルを
+* `FALSE`なら
     * `lib_dir`引数で指定した場所にコピーし
     * HTMLファイルから相対パスで参照する
 
@@ -328,7 +310,7 @@ CSSとかJavaScriptを定義しておくと、
 
 ```{r}
 output_format(
-  knitr = rmarkdown::knitr_options(
+  knitr = knitr_options(
     opts_chunk = list(include = FALSE)
   ),
   base_format = html_document()

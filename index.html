@@ -597,10 +597,8 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <p>インストールするには<br />
 <code class="sourceCode r">remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;atusy/tokyor85down)</span></code></p>
 </section></section>
-<section><section id="level-1" class="title-slide slide level1"><h1>Lv.1 ラッパー定義</h1><p><code>output</code>に指定する</p>
-<p><code>html_document</code>とかは</p>
-<p><strong>関数</strong>だから、</p>
-<p>ラッパー書けば<code>output</code>に指定できる！</p></section><section id="html_documentは関数だよ" class="slide level2">
+<section><section id="level-1" class="title-slide slide level1"><h1>Lv.1 ラッパー定義</h1><p><code>html_document</code>とかは<strong>関数</strong>！</p>
+<p>ラッパー関数も<code>output</code>に指定可！</p></section><section id="html_documentは関数だよ" class="slide level2">
 <h2><code>html_document</code>は関数だよ</h2>
 <p>YAML使わないなら↓な感じ。</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">library</span>(rmarkdown)</span>
@@ -636,13 +634,10 @@ document.getElementsByTagName('head')[0].appendChild(style);
 <span id="cb5-17"><a href="#cb5-17"></a><span class="co">#&gt;     ...</span></span>
 <span id="cb5-18"><a href="#cb5-18"></a><span class="co">#&gt;   )</span></span>
 <span id="cb5-19"><a href="#cb5-19"></a><span class="co">#&gt; }</span></span>
-<span id="cb5-20"><a href="#cb5-20"></a><span class="co">#&gt; &lt;bytecode: 0x5566cfd628f8&gt;</span></span>
+<span id="cb5-20"><a href="#cb5-20"></a><span class="co">#&gt; &lt;bytecode: 0x555b0a9148c8&gt;</span></span>
 <span id="cb5-21"><a href="#cb5-21"></a><span class="co">#&gt; &lt;environment: namespace:tokyor85down&gt;</span></span></code></pre></div>
 </section></section>
 <section><section id="level-2-word" class="title-slide slide level1"><h1>Lv.2 依存ファイル追加</h1><p><strong>基本編（絶対パスOK）</strong></p>
-<p>例えば<br />
-<code>word_document</code>関数にオリジナルの<br />
-<code>reference_docx</code>を指定したい</p>
 <p><small> HTMLで<code>self_contained = FALSE</code>を使わない限りは、基本編で十分なはず。 </small></p></section><section id="wordの見出しに番号が欲しい" class="slide level2">
 <h2>Wordの見出しに番号が欲しい！</h2>
 <p>ではYAMLで<code>reference_docx</code>を指定しましょう。</p>
@@ -687,29 +682,24 @@ document.getElementsByTagName('head')[0].appendChild(style);
 </section><section id="css追加との相性がbad" class="slide level2">
 <h2>CSS追加との相性がBAD</h2>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">styled_html_document</span>(<span class="dt">css =</span> <span class="st">&quot;new.css&quot;</span>)</span></code></pre></div>
-<p>は必要なCSSを無視してしまうので</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="kw">styled_html_document</span>(</span>
-<span id="cb11-2"><a href="#cb11-2"></a>  <span class="dt">css =</span> <span class="kw">c</span>(<span class="kw">spec_css</span>(), <span class="st">&quot;new.css&quot;</span>)</span>
-<span id="cb11-3"><a href="#cb11-3"></a>)</span></code></pre></div>
-<p>する必要がある。めんどい。</p>
+<p>パッケージ提供のCSSを無視してしまう</p>
 </section><section id="htmlの携帯性もbad" class="slide level2">
 <h2>HTMLの携帯性もBAD</h2>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="kw">styled_html_document</span>(</span>
-<span id="cb12-2"><a href="#cb12-2"></a>  <span class="dt">self_contained =</span> <span class="ot">FALSE</span></span>
-<span id="cb12-3"><a href="#cb12-3"></a>)</span></code></pre></div>
-<p>↓</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="kw">styled_html_document</span>(</span>
+<span id="cb11-2"><a href="#cb11-2"></a>  <span class="dt">self_contained =</span> <span class="ot">FALSE</span></span>
+<span id="cb11-3"><a href="#cb11-3"></a>)</span></code></pre></div>
 <p>パッケージディレクトリ下にある<br />
 CSSを絶対パスで参照</p>
 </section><section id="extra_dependencies引数を使おう" class="slide level2">
 <h2>extra_dependencies引数を使おう</h2>
-<p>この引数で依存したい<br />
-CSSとかJavaScriptを定義しておくと、</p>
+<p>依存したいCSSとかJavaScriptを<br />
+<code>self_contained</code>が</p>
 <ul>
-<li><code>self_contained = TRUE</code>なら依存ファイルを
+<li><code>TRUE</code>なら
 <ul>
 <li>HTMLファイルに丸ごと取り込む</li>
 </ul></li>
-<li><code>self_contained = FALSE</code>なら依存ファイルを
+<li><code>FALSE</code>なら
 <ul>
 <li><code>lib_dir</code>引数で指定した場所にコピーし</li>
 <li>HTMLファイルから相対パスで参照する</li>
@@ -724,88 +714,88 @@ CSSとかJavaScriptを定義しておくと、</p>
 <h2>base_formatを改造できる</h2>
 <p>チャンクを実行しても一切出力に反映しない<br />
 ジョークフォーマットに魔改造できる</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="kw">output_format</span>(</span>
-<span id="cb13-2"><a href="#cb13-2"></a>  <span class="dt">knitr =</span> rmarkdown<span class="op">::</span><span class="kw">knitr_options</span>(</span>
-<span id="cb13-3"><a href="#cb13-3"></a>    <span class="dt">opts_chunk =</span> <span class="kw">list</span>(<span class="dt">include =</span> <span class="ot">FALSE</span>)</span>
-<span id="cb13-4"><a href="#cb13-4"></a>  ),</span>
-<span id="cb13-5"><a href="#cb13-5"></a>  <span class="dt">base_format =</span> <span class="kw">html_document</span>()</span>
-<span id="cb13-6"><a href="#cb13-6"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="kw">output_format</span>(</span>
+<span id="cb12-2"><a href="#cb12-2"></a>  <span class="dt">knitr =</span> <span class="kw">knitr_options</span>(</span>
+<span id="cb12-3"><a href="#cb12-3"></a>    <span class="dt">opts_chunk =</span> <span class="kw">list</span>(<span class="dt">include =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb12-4"><a href="#cb12-4"></a>  ),</span>
+<span id="cb12-5"><a href="#cb12-5"></a>  <span class="dt">base_format =</span> <span class="kw">html_document</span>()</span>
+<span id="cb12-6"><a href="#cb12-6"></a>)</span></code></pre></div>
 </section><section id="返り値はリスト" class="slide level2">
 <h2>返り値はリスト</h2>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>fmt &lt;-<span class="st"> </span>rmarkdown<span class="op">::</span><span class="kw">output_format</span>(<span class="ot">NULL</span>, <span class="ot">NULL</span>)</span>
-<span id="cb14-2"><a href="#cb14-2"></a><span class="kw">str</span>(fmt)</span>
-<span id="cb14-3"><a href="#cb14-3"></a><span class="co">#&gt; List of 11</span></span>
-<span id="cb14-4"><a href="#cb14-4"></a><span class="co">#&gt;  $ knitr                  : NULL</span></span>
-<span id="cb14-5"><a href="#cb14-5"></a><span class="co">#&gt;  $ pandoc                 : NULL</span></span>
-<span id="cb14-6"><a href="#cb14-6"></a><span class="co">#&gt;  $ keep_md                : logi FALSE</span></span>
-<span id="cb14-7"><a href="#cb14-7"></a><span class="co">#&gt;  $ clean_supporting       : logi TRUE</span></span>
-<span id="cb14-8"><a href="#cb14-8"></a><span class="co">#&gt;  $ df_print               : NULL</span></span>
-<span id="cb14-9"><a href="#cb14-9"></a><span class="co">#&gt;  $ pre_knit               : NULL</span></span>
-<span id="cb14-10"><a href="#cb14-10"></a><span class="co">#&gt;  $ post_knit              : NULL</span></span>
-<span id="cb14-11"><a href="#cb14-11"></a><span class="co">#&gt;  $ pre_processor          : NULL</span></span>
-<span id="cb14-12"><a href="#cb14-12"></a><span class="co">#&gt;  $ intermediates_generator: NULL</span></span>
-<span id="cb14-13"><a href="#cb14-13"></a><span class="co">#&gt;  $ post_processor         : NULL</span></span>
-<span id="cb14-14"><a href="#cb14-14"></a><span class="co">#&gt;  $ on_exit                : NULL</span></span>
-<span id="cb14-15"><a href="#cb14-15"></a><span class="co">#&gt;  - attr(*, &quot;class&quot;)= chr &quot;rmarkdown_output_format&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>fmt &lt;-<span class="st"> </span>rmarkdown<span class="op">::</span><span class="kw">output_format</span>(<span class="ot">NULL</span>, <span class="ot">NULL</span>)</span>
+<span id="cb13-2"><a href="#cb13-2"></a><span class="kw">str</span>(fmt)</span>
+<span id="cb13-3"><a href="#cb13-3"></a><span class="co">#&gt; List of 11</span></span>
+<span id="cb13-4"><a href="#cb13-4"></a><span class="co">#&gt;  $ knitr                  : NULL</span></span>
+<span id="cb13-5"><a href="#cb13-5"></a><span class="co">#&gt;  $ pandoc                 : NULL</span></span>
+<span id="cb13-6"><a href="#cb13-6"></a><span class="co">#&gt;  $ keep_md                : logi FALSE</span></span>
+<span id="cb13-7"><a href="#cb13-7"></a><span class="co">#&gt;  $ clean_supporting       : logi TRUE</span></span>
+<span id="cb13-8"><a href="#cb13-8"></a><span class="co">#&gt;  $ df_print               : NULL</span></span>
+<span id="cb13-9"><a href="#cb13-9"></a><span class="co">#&gt;  $ pre_knit               : NULL</span></span>
+<span id="cb13-10"><a href="#cb13-10"></a><span class="co">#&gt;  $ post_knit              : NULL</span></span>
+<span id="cb13-11"><a href="#cb13-11"></a><span class="co">#&gt;  $ pre_processor          : NULL</span></span>
+<span id="cb13-12"><a href="#cb13-12"></a><span class="co">#&gt;  $ intermediates_generator: NULL</span></span>
+<span id="cb13-13"><a href="#cb13-13"></a><span class="co">#&gt;  $ post_processor         : NULL</span></span>
+<span id="cb13-14"><a href="#cb13-14"></a><span class="co">#&gt;  $ on_exit                : NULL</span></span>
+<span id="cb13-15"><a href="#cb13-15"></a><span class="co">#&gt;  - attr(*, &quot;class&quot;)= chr &quot;rmarkdown_output_format&quot;</span></span></code></pre></div>
 </section><section id="要素の名前は引数由来" class="slide level2">
 <h2>要素の名前は引数由来</h2>
 <p>ただし<code>base_format</code>を除く</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>nm_arg &lt;-<span class="st"> </span><span class="kw">names</span>(<span class="kw">formals</span>(output_format))</span>
-<span id="cb15-2"><a href="#cb15-2"></a>nm_fmt &lt;-<span class="st"> </span><span class="kw">names</span>(fmt)</span>
-<span id="cb15-3"><a href="#cb15-3"></a></span>
-<span id="cb15-4"><a href="#cb15-4"></a><span class="kw">setdiff</span>(nm_arg, nm_fmt)</span>
-<span id="cb15-5"><a href="#cb15-5"></a><span class="co">#&gt; [1] &quot;base_format&quot;</span></span>
-<span id="cb15-6"><a href="#cb15-6"></a><span class="kw">setdiff</span>(nm_fmt, nm_arg)</span>
-<span id="cb15-7"><a href="#cb15-7"></a><span class="co">#&gt; character(0)</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>nm_arg &lt;-<span class="st"> </span><span class="kw">names</span>(<span class="kw">formals</span>(output_format))</span>
+<span id="cb14-2"><a href="#cb14-2"></a>nm_fmt &lt;-<span class="st"> </span><span class="kw">names</span>(fmt)</span>
+<span id="cb14-3"><a href="#cb14-3"></a></span>
+<span id="cb14-4"><a href="#cb14-4"></a><span class="kw">setdiff</span>(nm_arg, nm_fmt)</span>
+<span id="cb14-5"><a href="#cb14-5"></a><span class="co">#&gt; [1] &quot;base_format&quot;</span></span>
+<span id="cb14-6"><a href="#cb14-6"></a><span class="kw">setdiff</span>(nm_fmt, nm_arg)</span>
+<span id="cb14-7"><a href="#cb14-7"></a><span class="co">#&gt; character(0)</span></span></code></pre></div>
 </section><section id="html_documentとの比較" class="slide level2">
 <h2>html_documentとの比較</h2>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>html_fmt &lt;-<span class="st"> </span><span class="kw">html_document</span>()</span>
-<span id="cb16-2"><a href="#cb16-2"></a></span>
-<span id="cb16-3"><a href="#cb16-3"></a><span class="kw">identical</span>(nm_fmt, <span class="kw">names</span>(html_fmt))</span>
-<span id="cb16-4"><a href="#cb16-4"></a><span class="co">#&gt; [1] TRUE</span></span>
-<span id="cb16-5"><a href="#cb16-5"></a></span>
-<span id="cb16-6"><a href="#cb16-6"></a><span class="kw">str</span>(html_fmt)</span>
-<span id="cb16-7"><a href="#cb16-7"></a><span class="co">#&gt; List of 11</span></span>
-<span id="cb16-8"><a href="#cb16-8"></a><span class="co">#&gt;  $ knitr                  :List of 5</span></span>
-<span id="cb16-9"><a href="#cb16-9"></a><span class="co">#&gt;   ..$ opts_knit    : NULL</span></span>
-<span id="cb16-10"><a href="#cb16-10"></a><span class="co">#&gt;   ..$ opts_chunk   :List of 5</span></span>
-<span id="cb16-11"><a href="#cb16-11"></a><span class="co">#&gt;   .. ..$ dev       : chr &quot;png&quot;</span></span>
-<span id="cb16-12"><a href="#cb16-12"></a><span class="co">#&gt;   .. ..$ dpi       : num 96</span></span>
-<span id="cb16-13"><a href="#cb16-13"></a><span class="co">#&gt;   .. ..$ fig.width : num 7</span></span>
-<span id="cb16-14"><a href="#cb16-14"></a><span class="co">#&gt;   .. ..$ fig.height: num 5</span></span>
-<span id="cb16-15"><a href="#cb16-15"></a><span class="co">#&gt;   .. ..$ fig.retina: num 2</span></span>
-<span id="cb16-16"><a href="#cb16-16"></a><span class="co">#&gt;   ..$ knit_hooks   : NULL</span></span>
-<span id="cb16-17"><a href="#cb16-17"></a><span class="co">#&gt;   ..$ opts_hooks   : NULL</span></span>
-<span id="cb16-18"><a href="#cb16-18"></a><span class="co">#&gt;   ..$ opts_template: NULL</span></span>
-<span id="cb16-19"><a href="#cb16-19"></a><span class="co">#&gt;  $ pandoc                 :List of 6</span></span>
-<span id="cb16-20"><a href="#cb16-20"></a><span class="co">#&gt;   ..$ to          : chr &quot;html&quot;</span></span>
-<span id="cb16-21"><a href="#cb16-21"></a><span class="co">#&gt;   ..$ from        : chr &quot;markdown+autolink_bare_uris+tex_math_single_backslash+smart&quot;</span></span>
-<span id="cb16-22"><a href="#cb16-22"></a><span class="co">#&gt;   ..$ args        : chr [1:10] &quot;--email-obfuscation&quot; &quot;none&quot; &quot;--self-contained&quot; &quot;--standalone&quot; ...</span></span>
-<span id="cb16-23"><a href="#cb16-23"></a><span class="co">#&gt;   ..$ keep_tex    : logi FALSE</span></span>
-<span id="cb16-24"><a href="#cb16-24"></a><span class="co">#&gt;   ..$ latex_engine: chr &quot;pdflatex&quot;</span></span>
-<span id="cb16-25"><a href="#cb16-25"></a><span class="co">#&gt;   ..$ ext         : NULL</span></span>
-<span id="cb16-26"><a href="#cb16-26"></a><span class="co">#&gt;  $ keep_md                : logi FALSE</span></span>
-<span id="cb16-27"><a href="#cb16-27"></a><span class="co">#&gt;  $ clean_supporting       : logi TRUE</span></span>
-<span id="cb16-28"><a href="#cb16-28"></a><span class="co">#&gt;  $ df_print               : chr &quot;default&quot;</span></span>
-<span id="cb16-29"><a href="#cb16-29"></a><span class="co">#&gt;  $ pre_knit               :function (...)  </span></span>
-<span id="cb16-30"><a href="#cb16-30"></a><span class="co">#&gt;   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 115 5 117 5 5 5 4614 4616</span></span>
-<span id="cb16-31"><a href="#cb16-31"></a><span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilealias&#39;, &#39;srcfile&#39; &lt;environment: 0x5566cdbee758&gt; </span></span>
-<span id="cb16-32"><a href="#cb16-32"></a><span class="co">#&gt;  $ post_knit              :function (...)  </span></span>
-<span id="cb16-33"><a href="#cb16-33"></a><span class="co">#&gt;   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 115 5 117 5 5 5 4614 4616</span></span>
-<span id="cb16-34"><a href="#cb16-34"></a><span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilealias&#39;, &#39;srcfile&#39; &lt;environment: 0x5566cdbee758&gt; </span></span>
-<span id="cb16-35"><a href="#cb16-35"></a><span class="co">#&gt;  $ pre_processor          :function (...)  </span></span>
-<span id="cb16-36"><a href="#cb16-36"></a><span class="co">#&gt;   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 115 5 117 5 5 5 4614 4616</span></span>
-<span id="cb16-37"><a href="#cb16-37"></a><span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilealias&#39;, &#39;srcfile&#39; &lt;environment: 0x5566cdbee758&gt; </span></span>
-<span id="cb16-38"><a href="#cb16-38"></a><span class="co">#&gt;  $ intermediates_generator:function (original_input, intermediates_dir)  </span></span>
-<span id="cb16-39"><a href="#cb16-39"></a><span class="co">#&gt;   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 118 30 122 3 30 3 1793 1797</span></span>
-<span id="cb16-40"><a href="#cb16-40"></a><span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilealias&#39;, &#39;srcfile&#39; &lt;environment: 0x5566cea68e28&gt; </span></span>
-<span id="cb16-41"><a href="#cb16-41"></a><span class="co">#&gt;  $ post_processor         :function (metadata, input_file, output_file, clean, verbose)  </span></span>
-<span id="cb16-42"><a href="#cb16-42"></a><span class="co">#&gt;   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 124 21 172 3 21 3 1799 1847</span></span>
-<span id="cb16-43"><a href="#cb16-43"></a><span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilealias&#39;, &#39;srcfile&#39; &lt;environment: 0x5566cea68e28&gt; </span></span>
-<span id="cb16-44"><a href="#cb16-44"></a><span class="co">#&gt;  $ on_exit                :function ()  </span></span>
-<span id="cb16-45"><a href="#cb16-45"></a><span class="co">#&gt;   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 182 3 185 3 3 3 4681 4684</span></span>
-<span id="cb16-46"><a href="#cb16-46"></a><span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilealias&#39;, &#39;srcfile&#39; &lt;environment: 0x5566cdbee758&gt; </span></span>
-<span id="cb16-47"><a href="#cb16-47"></a><span class="co">#&gt;  - attr(*, &quot;class&quot;)= chr &quot;rmarkdown_output_format&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>html_fmt &lt;-<span class="st"> </span><span class="kw">html_document</span>()</span>
+<span id="cb15-2"><a href="#cb15-2"></a></span>
+<span id="cb15-3"><a href="#cb15-3"></a><span class="kw">identical</span>(nm_fmt, <span class="kw">names</span>(html_fmt))</span>
+<span id="cb15-4"><a href="#cb15-4"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb15-5"><a href="#cb15-5"></a></span>
+<span id="cb15-6"><a href="#cb15-6"></a><span class="kw">str</span>(html_fmt)</span>
+<span id="cb15-7"><a href="#cb15-7"></a><span class="co">#&gt; List of 11</span></span>
+<span id="cb15-8"><a href="#cb15-8"></a><span class="co">#&gt;  $ knitr                  :List of 5</span></span>
+<span id="cb15-9"><a href="#cb15-9"></a><span class="co">#&gt;   ..$ opts_knit    : NULL</span></span>
+<span id="cb15-10"><a href="#cb15-10"></a><span class="co">#&gt;   ..$ opts_chunk   :List of 5</span></span>
+<span id="cb15-11"><a href="#cb15-11"></a><span class="co">#&gt;   .. ..$ dev       : chr &quot;png&quot;</span></span>
+<span id="cb15-12"><a href="#cb15-12"></a><span class="co">#&gt;   .. ..$ dpi       : num 96</span></span>
+<span id="cb15-13"><a href="#cb15-13"></a><span class="co">#&gt;   .. ..$ fig.width : num 7</span></span>
+<span id="cb15-14"><a href="#cb15-14"></a><span class="co">#&gt;   .. ..$ fig.height: num 5</span></span>
+<span id="cb15-15"><a href="#cb15-15"></a><span class="co">#&gt;   .. ..$ fig.retina: num 2</span></span>
+<span id="cb15-16"><a href="#cb15-16"></a><span class="co">#&gt;   ..$ knit_hooks   : NULL</span></span>
+<span id="cb15-17"><a href="#cb15-17"></a><span class="co">#&gt;   ..$ opts_hooks   : NULL</span></span>
+<span id="cb15-18"><a href="#cb15-18"></a><span class="co">#&gt;   ..$ opts_template: NULL</span></span>
+<span id="cb15-19"><a href="#cb15-19"></a><span class="co">#&gt;  $ pandoc                 :List of 6</span></span>
+<span id="cb15-20"><a href="#cb15-20"></a><span class="co">#&gt;   ..$ to          : chr &quot;html&quot;</span></span>
+<span id="cb15-21"><a href="#cb15-21"></a><span class="co">#&gt;   ..$ from        : chr &quot;markdown+autolink_bare_uris+tex_math_single_backslash+smart&quot;</span></span>
+<span id="cb15-22"><a href="#cb15-22"></a><span class="co">#&gt;   ..$ args        : chr [1:10] &quot;--email-obfuscation&quot; &quot;none&quot; &quot;--self-contained&quot; &quot;--standalone&quot; ...</span></span>
+<span id="cb15-23"><a href="#cb15-23"></a><span class="co">#&gt;   ..$ keep_tex    : logi FALSE</span></span>
+<span id="cb15-24"><a href="#cb15-24"></a><span class="co">#&gt;   ..$ latex_engine: chr &quot;pdflatex&quot;</span></span>
+<span id="cb15-25"><a href="#cb15-25"></a><span class="co">#&gt;   ..$ ext         : NULL</span></span>
+<span id="cb15-26"><a href="#cb15-26"></a><span class="co">#&gt;  $ keep_md                : logi FALSE</span></span>
+<span id="cb15-27"><a href="#cb15-27"></a><span class="co">#&gt;  $ clean_supporting       : logi TRUE</span></span>
+<span id="cb15-28"><a href="#cb15-28"></a><span class="co">#&gt;  $ df_print               : chr &quot;default&quot;</span></span>
+<span id="cb15-29"><a href="#cb15-29"></a><span class="co">#&gt;  $ pre_knit               :function (...)  </span></span>
+<span id="cb15-30"><a href="#cb15-30"></a><span class="co">#&gt;   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 115 5 117 5 5 5 4614 4616</span></span>
+<span id="cb15-31"><a href="#cb15-31"></a><span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilealias&#39;, &#39;srcfile&#39; &lt;environment: 0x555b087bf758&gt; </span></span>
+<span id="cb15-32"><a href="#cb15-32"></a><span class="co">#&gt;  $ post_knit              :function (...)  </span></span>
+<span id="cb15-33"><a href="#cb15-33"></a><span class="co">#&gt;   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 115 5 117 5 5 5 4614 4616</span></span>
+<span id="cb15-34"><a href="#cb15-34"></a><span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilealias&#39;, &#39;srcfile&#39; &lt;environment: 0x555b087bf758&gt; </span></span>
+<span id="cb15-35"><a href="#cb15-35"></a><span class="co">#&gt;  $ pre_processor          :function (...)  </span></span>
+<span id="cb15-36"><a href="#cb15-36"></a><span class="co">#&gt;   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 115 5 117 5 5 5 4614 4616</span></span>
+<span id="cb15-37"><a href="#cb15-37"></a><span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilealias&#39;, &#39;srcfile&#39; &lt;environment: 0x555b087bf758&gt; </span></span>
+<span id="cb15-38"><a href="#cb15-38"></a><span class="co">#&gt;  $ intermediates_generator:function (original_input, intermediates_dir)  </span></span>
+<span id="cb15-39"><a href="#cb15-39"></a><span class="co">#&gt;   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 118 30 122 3 30 3 1793 1797</span></span>
+<span id="cb15-40"><a href="#cb15-40"></a><span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilealias&#39;, &#39;srcfile&#39; &lt;environment: 0x555b09639e28&gt; </span></span>
+<span id="cb15-41"><a href="#cb15-41"></a><span class="co">#&gt;  $ post_processor         :function (metadata, input_file, output_file, clean, verbose)  </span></span>
+<span id="cb15-42"><a href="#cb15-42"></a><span class="co">#&gt;   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 124 21 172 3 21 3 1799 1847</span></span>
+<span id="cb15-43"><a href="#cb15-43"></a><span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilealias&#39;, &#39;srcfile&#39; &lt;environment: 0x555b09639e28&gt; </span></span>
+<span id="cb15-44"><a href="#cb15-44"></a><span class="co">#&gt;  $ on_exit                :function ()  </span></span>
+<span id="cb15-45"><a href="#cb15-45"></a><span class="co">#&gt;   ..- attr(*, &quot;srcref&quot;)= &#39;srcref&#39; int [1:8] 182 3 185 3 3 3 4681 4684</span></span>
+<span id="cb15-46"><a href="#cb15-46"></a><span class="co">#&gt;   .. ..- attr(*, &quot;srcfile&quot;)=Classes &#39;srcfilealias&#39;, &#39;srcfile&#39; &lt;environment: 0x555b087bf758&gt; </span></span>
+<span id="cb15-47"><a href="#cb15-47"></a><span class="co">#&gt;  - attr(*, &quot;class&quot;)= chr &quot;rmarkdown_output_format&quot;</span></span></code></pre></div>
 </section><section id="なぜoutput_formatで改造するのか" class="slide level2">
 <h2>なぜ<code>output_format</code>で改造するのか?</h2>
 <ul>
@@ -818,16 +808,16 @@ CSSとかJavaScriptを定義しておくと、</p>
 </ul>
 </section><section id="on_exit処理の結合例" class="slide level2">
 <h2>on_exit処理の結合例</h2>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="co"># on_exitには最終処理を記述すると</span></span>
-<span id="cb17-2"><a href="#cb17-2"></a><span class="kw">output_format</span>(</span>
-<span id="cb17-3"><a href="#cb17-3"></a>  <span class="dt">on_exit =</span> <span class="cf">function</span>(...) <span class="kw">message</span>(<span class="st">&quot;Almost done&quot;</span>),</span>
-<span id="cb17-4"><a href="#cb17-4"></a>  <span class="dt">base_format =</span> <span class="kw">html_document</span>()</span>
-<span id="cb17-5"><a href="#cb17-5"></a>)</span></code></pre></div>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="co"># 2つのon_exitを結合してくれる</span></span>
-<span id="cb18-2"><a href="#cb18-2"></a><span class="cf">function</span>(...) <span class="kw">c</span>(</span>
-<span id="cb18-3"><a href="#cb18-3"></a>    <span class="kw">html_document</span>()<span class="op">$</span><span class="kw">on_exit</span>(...),</span>
-<span id="cb18-4"><a href="#cb18-4"></a>    <span class="cf">function</span>(...) <span class="kw">message</span>(<span class="st">&quot;Almost done&quot;</span>)</span>
-<span id="cb18-5"><a href="#cb18-5"></a>  )</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="co"># on_exitには最終処理を記述すると</span></span>
+<span id="cb16-2"><a href="#cb16-2"></a><span class="kw">output_format</span>(</span>
+<span id="cb16-3"><a href="#cb16-3"></a>  <span class="dt">on_exit =</span> <span class="cf">function</span>(...) <span class="kw">message</span>(<span class="st">&quot;Almost done&quot;</span>),</span>
+<span id="cb16-4"><a href="#cb16-4"></a>  <span class="dt">base_format =</span> <span class="kw">html_document</span>()</span>
+<span id="cb16-5"><a href="#cb16-5"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="co"># 2つのon_exitを結合してくれる</span></span>
+<span id="cb17-2"><a href="#cb17-2"></a><span class="cf">function</span>(...) <span class="kw">c</span>(</span>
+<span id="cb17-3"><a href="#cb17-3"></a>    <span class="kw">html_document</span>()<span class="op">$</span><span class="kw">on_exit</span>(...),</span>
+<span id="cb17-4"><a href="#cb17-4"></a>    <span class="cf">function</span>(...) <span class="kw">message</span>(<span class="st">&quot;Almost done&quot;</span>)</span>
+<span id="cb17-5"><a href="#cb17-5"></a>  )</span></code></pre></div>
 </section><section id="結合方法の詳細は" class="slide level2">
 <h2>結合方法の詳細は</h2>
 <p><code>rmarkdown:::merge_output_formats</code>の実装を見てネ。</p>
@@ -872,16 +862,16 @@ base_format | リスト |
 </ul></li>
 </ul></section><section id="link-新ウィンドウ" class="slide level2">
 <h2>Link → 新ウィンドウ</h2>
-<div class="sourceCode" id="cb19"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb19-1"><a href="#cb19-1"></a><span class="kw">function</span> Link<span class="op">(</span>el<span class="op">)</span></span>
-<span id="cb19-2"><a href="#cb19-2"></a>  <span class="co">-- targetが指定済みならそのまま</span></span>
-<span id="cb19-3"><a href="#cb19-3"></a>  <span class="cf">if</span> el<span class="op">.</span>attributes<span class="op">.</span>target <span class="cf">then</span></span>
-<span id="cb19-4"><a href="#cb19-4"></a>    <span class="cf">return</span><span class="op">(</span>el<span class="op">)</span></span>
-<span id="cb19-5"><a href="#cb19-5"></a>  <span class="cf">end</span></span>
-<span id="cb19-6"><a href="#cb19-6"></a></span>
-<span id="cb19-7"><a href="#cb19-7"></a>  <span class="co">-- 未指定なら_blankにする</span></span>
-<span id="cb19-8"><a href="#cb19-8"></a>  el<span class="op">.</span>attributes<span class="op">.</span>target <span class="op">=</span> <span class="st">&quot;_blank&quot;</span></span>
-<span id="cb19-9"><a href="#cb19-9"></a>  <span class="cf">return</span><span class="op">(</span>el<span class="op">)</span></span>
-<span id="cb19-10"><a href="#cb19-10"></a><span class="cf">end</span></span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb18-1"><a href="#cb18-1"></a><span class="kw">function</span> Link<span class="op">(</span>el<span class="op">)</span></span>
+<span id="cb18-2"><a href="#cb18-2"></a>  <span class="co">-- targetが指定済みならそのまま</span></span>
+<span id="cb18-3"><a href="#cb18-3"></a>  <span class="cf">if</span> el<span class="op">.</span>attributes<span class="op">.</span>target <span class="cf">then</span></span>
+<span id="cb18-4"><a href="#cb18-4"></a>    <span class="cf">return</span><span class="op">(</span>el<span class="op">)</span></span>
+<span id="cb18-5"><a href="#cb18-5"></a>  <span class="cf">end</span></span>
+<span id="cb18-6"><a href="#cb18-6"></a></span>
+<span id="cb18-7"><a href="#cb18-7"></a>  <span class="co">-- 未指定なら_blankにする</span></span>
+<span id="cb18-8"><a href="#cb18-8"></a>  el<span class="op">.</span>attributes<span class="op">.</span>target <span class="op">=</span> <span class="st">&quot;_blank&quot;</span></span>
+<span id="cb18-9"><a href="#cb18-9"></a>  <span class="cf">return</span><span class="op">(</span>el<span class="op">)</span></span>
+<span id="cb18-10"><a href="#cb18-10"></a><span class="cf">end</span></span></code></pre></div>
 <p>本資料でも活躍</p>
 </section><section id="使い方" class="slide level2">
 <h2>使い方</h2>
