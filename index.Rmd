@@ -438,7 +438,7 @@ output:
       - "filters.lua"
 ```
 
-# Enjoy & Sponsor Me!
+# Enjoy & Support Me!
 
 * Rにこれからもどんどん貢献したい
     * プロジェクトにもコミュニティにも
