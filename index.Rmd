@@ -211,11 +211,7 @@ output:
 パッケージの`inst`ディレクトリ以下の \
 好きなところに保存しておく
 
-```{r, eval=TRUE, include=FALSE}
-docx <- "`inst/docx/reference.docx`"
-```
-
-例えば`r gh(txt = docx, dir = "", filename = docx)`
+例えば[`inst/docx/reference.docx`](https://github.com/atusy/tokyor85down/tree/master/inst/docx)
 
 
 ## Wordのテンプレを差し替え
