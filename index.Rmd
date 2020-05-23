@@ -12,7 +12,12 @@ output:
     self_contained: false
     center: true
     css: revealjs.css
-    math: null
+    mathjax: null
+    pandoc_args:
+      - "--lua-filter"
+      - "filters.lua"
+    reveal_options:
+      slideNumber: true
 ---
 
 ```{r setup, include=FALSE}
@@ -27,14 +32,13 @@ opts_chunk$set(eval = FALSE, collapse = TRUE, comment = "#>")
 tokyor85down <- "tokyor85down" %in% rownames(installed.packages())
 gh <- function(filename, txt = "実装はGitHubで", dir = "R") {
   sprintf(
-    "[%s](%s){%s}",
+    "[%s](%s)",
     txt,
     file.path(
       "https://github.com/atusy/tokyor85down/blob/master",
       dir,
       filename
-    ),
-    "target='_blank'"
+    )
   )
 }
 ```
@@ -61,11 +65,12 @@ gh <- function(filename, txt = "実装はGitHubで", dir = "R") {
 
 :::
 
-# ![](osakar_600_600.png){height=400px}
+# ![](osakar_600_600.png){height=300px}
 
 * Skype朝もく (毎平日7:30--10:00)
     * 途中参加・途中離脱OK
-* 勉強会 (初回6/6)
+    * アカウント不要
+    * アプリ不要
 * <https://osaka-r.connpass.com/>
 
 # minidown on CRAN
@@ -123,8 +128,8 @@ output: tokyor85down::rich_html_document
 output:
   html_document:
     toc: TRUE
-    toc_float: TRUE,
-    number_sections: TRUE,
+    toc_float: TRUE
+    number_sections: TRUE
     code_folding: show
     code_download: TRUE
 ```
@@ -137,7 +142,7 @@ output:
 
 ## 要件: パッケージを書ける
 
-書けるようになろう☆
+参考: [2019年版Rパッケージ開発の手引き by uri氏](https://speakerdeck.com/s_uryu/pkg-dev)
 
 フルスクラッチが怖いなら \
 [atusy/tokyor85down](https://github.com/atusy/tokyor85down) \
@@ -413,7 +418,7 @@ base_format | リスト |
 # Lv.5 テンプレ.Rmd作り
 
 `File` -> `New File` -> `R Markdown...` \
-からテンプレを選べるようにするには
+から選べるテンプレを作るには
 
 `GOTO`
 
@@ -435,6 +440,25 @@ base_format | リスト |
 * 参考
     * [Pandoc lua filter手習い: detailクラス付きのコードブロックを折り畳む](https://blog.atusy.net/2020/03/07/pandoc-lua-detailed-codeblock/)
 
+## Link → 新ウィンドウ
+
+```lua
+`r paste0(readLines("filters.lua"), collapse = "\n")`
+```
+
+本資料でも活躍
+
+## 使い方
+
+`pandoc_args`引数に指定
+
+```
+output:
+  html_document:
+    pandoc_args:
+      - "--lua-filter"
+      - "filters.lua"
+```
 
 # Enjoy & Sponsor Me!
 
@@ -443,7 +467,7 @@ base_format | リスト |
     * ただし趣味として
 * TwitterとかGitHubで褒めてください
 * スポンサーもして頂けると非常にありがたいです
-    * モチベーション維持
+    * モチベーション向上
     * 開発環境や移動のための予算確保
 
-<https://github.com/sponsor/atusy>
+<https://github.com/sponsors/atusy>
